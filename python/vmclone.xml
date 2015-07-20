@@ -7,7 +7,7 @@ For Linux, use:
         * Name: string or SAME_AS_VM (the hostname will be set as the same name of the VM)
         * Domain: string
         * IP0: ip address or dhcp value for dhcp
-
+        * autoLogon: accepts 1, 0, t, f, true, false, yes, no
         * joinDomain is the Windows value for the user domain
         * IP0dnsdomain is the machine domain
 
@@ -33,7 +33,8 @@ For Windows, use all the rest (not tested)
   	  <productId>XXXX-XXXX-XXXX-XXXX-XXXX</productId>
    </OS-Spec>
    <Network-Spec>
-     <NetworkName>testing</NetworkName>>
+     <IP0startConnected>1</IP0startConnected>
+     <IP0Network>script_pg</IP0Network>
      <IP0>dhcp</IP0>
      <IP0gateway>192.168.0.1</IP0gateway>
      <IP0dnsServerList>192.168.0.43:192.168.0.1</IP0dnsServerList>
@@ -43,11 +44,9 @@ For Windows, use all the rest (not tested)
      <IP0primaryWINS>192.168.0.43</IP0primaryWINS>
      <IP0secondaryWINS></IP0secondaryWINS>
    </Network-Spec>
-
    <VM-Spec>
         <Memory>1024</Memory>
         <Disksize>4194304</Disksize>
         <Number-of-CPUS>1</Number-of-CPUS>
-        <Network>script_pg</Network>
     </VM-Spec>
 </Specification>

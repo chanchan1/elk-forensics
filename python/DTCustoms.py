@@ -138,7 +138,7 @@ def getCustomNICSettingMap(nw_spec):
 
 	return cust_adapter_mapping_list
 
-def getCustomSpecObject(filename):
+def getOSCustomization(filename):
 	customOSSpec = getSpecFromXML(filename, "OS-Spec")
 	customNetworkSpec = getSpecFromXML(filename, "Network-Spec")
 
@@ -146,6 +146,60 @@ def getCustomSpecObject(filename):
 	            									globalIPSettings=getCustomGlobalIPSettings(customNetworkSpec),
 													nicSettingMap=getCustomNICSettingMap(customNetworkSpec))
 	return customization_spec;
+
+def setNetworkDevice(content, vm, nw_spec):
+    network_dev_key = None;
+    devices = template.config.hardware.device
+    for dev in devices:
+        if type(dev) is vm.device.VirtualVmxnet3 or
+            type(dev) is vm.device.VirtualE1000 or
+            type(dev) is vm.device.VirtualE1000e or
+            type(dev) is vm.device.VirtualPCNet32 or
+            type(dev) is vm.device.VirtualVmxnet2:
+                network_dev_key = dev.key
+
+    target_network=nw_spec['IP0Network']
+    if target_network:
+        network_view = getObject(content, [vim.Network], target_network)
+       # New object which defines network backing for a virtual Ethernet card
+       virtual_device_backing_info = vim.VirtualEthernetCardNetworkBackingInfo(network=network_view,
+                                                                                deviceName=target_network)
+    else: #not sure what's gonna happen here :D
+        virtual_device_backing_info = vim.VirtualEthernetCardNetworkBackingInfo()
+
+
+   # New object which contains information about connectable virtual devices
+   vdev_connect_info = vim.VirtualDeviceConnectInfo(startConnected=str2bool(nw_spec['IP0startConnected']),
+                                                        allowGuestControl=False,
+                                                        connected=True);
+   # New object which define virtual device
+   network_device = vim.VirtualVmxnet3(key => $network_dev_key,
+                                       backing => $virtual_device_backing_info,
+                                       connectable => $vdev_connect_info);
+
+   # New object which encapsulates change specifications for an individual virtual device
+   my @device_config_spec = VirtualDeviceConfigSpec->new(
+                                                     operation => VirtualDeviceConfigSpecOperation->new('edit'),
+                                                     device => $network_device);
+
+   # New object which encapsulates configuration settings when creating or reconfiguring a virtual machine
+   my $vm_config_spec = VirtualMachineConfigSpec->new(
+                                                  name => $vmname,
+                                                  memoryMB => $memory,
+                                                  numCPUs => $num_cpus,
+                                                  deviceChange => \@device_config_spec);
+   return $vm_config_spec;
+
+
+
+
+
+def getVMSpecification(filename)
+    customVMSpec = getSpecFromXML(filename, "VM-Spec")
+    customNetworkSpec = getSpecFromXML(filename, "Network-Spec")
+
+    network = customNetworkSpec['IP0Network']
+
 
 """
 def WaitForTasks(tasks, si):
