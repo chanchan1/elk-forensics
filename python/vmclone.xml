@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+custType = Linux/Lin or Win/Windows
+
+For Linux, use:
+
+        * Name: string or SAME_AS_VM (the hostname will be set as the same name of the VM)
+        * Domain: string
+        * IP0: ip address or dhcp value for dhcp
+
+        * joinDomain is the Windows value for the user domain
+        * IP0dnsdomain is the machine domain
+
+        ** all the other fields are ignored!
+
+For Windows, use all the rest (not tested)
+
+-->
+<Specification>
+   <OS-Spec>
+      <custType>Linux</custType>
+  	  <name>SAME_AS_VM</name>
+      <joinDomain>sec-cdc.local</joinDomain>
+      <joinWorkgroup>sec-cdc.local</joinWorkgroup>
+  	  <autoLogon>1</autoLogon>
+  	  <timeZone>100</timeZone>
+  	  <domainAdmin>Administrator</domainAdmin>
+  	  <domainAdminPassword>secret</domainAdminPassword>
+  	  <fullName>Bob von Alice</fullName>
+      <orgName>Acme</orgName>
+  	  <autoMode>perServer</autoMode>
+  	  <autoUsers>5</autoUsers>
+  	  <productId>XXXX-XXXX-XXXX-XXXX-XXXX</productId>
+   </OS-Spec>
+   <Network-Spec>
+     <NetworkName>testing</NetworkName>>
+     <IP0>dhcp</IP0>
+     <IP0gateway>192.168.0.1</IP0gateway>
+     <IP0dnsServerList>192.168.0.43:192.168.0.1</IP0dnsServerList>
+     <IP0dnsSuffixList>sec-cdc.local</IP0dnsSuffixList>
+     <IP0subnetMask>255.255.255.0</IP0subnetMask>
+     <IP0dnsDomain>calls.local</IP0dnsDomain>
+     <IP0primaryWINS>192.168.0.43</IP0primaryWINS>
+     <IP0secondaryWINS></IP0secondaryWINS>
+   </Network-Spec>
+
+   <VM-Spec>
+        <Memory>1024</Memory>
+        <Disksize>4194304</Disksize>
+        <Number-of-CPUS>1</Number-of-CPUS>
+        <Network>script_pg</Network>
+    </VM-Spec>
+</Specification>
