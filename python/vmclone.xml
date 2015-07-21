@@ -1,25 +1,55 @@
 <?xml version="1.0"?>
 <!--
-custType = Linux/Lin or Win/Windows
+OS-Spec
+   *custType: TODO: this can be done automatically by checking VirtualMachine.summary.guest.guestId, at least for distintion between Linux Windows (check if starts with "win")
+            String list: https://www.vmware.com/support/developer/vc-sdk/visdk25pubs/ReferenceGuide/vim.vm.GuestOsDescriptor.GuestOsIdentifier.html
+            values: Linux, Windows
 
-For Linux, use:
+   *name: Hostname of the OS *this is not the name of the VM*
+            values: SAME_AS_VM or string
 
-        * Name: string or SAME_AS_VM (the hostname will be set as the same name of the VM)
-        * Domain: string
-        * IP0: ip address or dhcp value for dhcp
-        * autoLogon: accepts 1, 0, t, f, true, false, yes, no
-        * joinDomain is the Windows value for the user domain
-        * IP0dnsdomain is the machine domain
+   *joinDomain: Defines the OS domain. Mandatory for Linux (because of the function call)
+            values: string
 
-        ** all the other fields are ignored!
+   joinWorkgroup: Defines the OS workgroup. Windows Only.
+            values: string (Linux)
+   autoLogon: 1
+   timeZone: 100
+   domainAdmin: Administrator
+   domainAdminPassword: secret
+   fullName: Bob von Acme
+   orgName: Acme
+   autoMode: perServer
+   autoUsers: 5
+   productId: >XXXX-XXXX-XXXX-XXXX-XXXX
+</OS-Spec>
+<Network-Spec>
+  <IP0Network>script_pg</IP0Network>
+  <IP0startConnected>1</IP0startConnected>
+  <IP0>dhcp</IP0>
+  <IP0gateway>192.168.0.1</IP0gateway>
+  <IP0dnsServerList>192.168.0.43:192.168.0.1</IP0dnsServerList>
+  <IP0dnsSuffixList>sec-cdc.local</IP0dnsSuffixList>
+  <IP0subnetMask>255.255.255.0</IP0subnetMask>
+  <IP0dnsDomain>calls.local</IP0dnsDomain>
+  <IP0primaryWINS>192.168.0.43</IP0primaryWINS>
+  <IP0secondaryWINS></IP0secondaryWINS>
+</Network-Spec>
+<VM-Spec>
+     <Name>
+     <Memory>1024</Memory>
+     <Disksize>4194304</Disksize>
+     <Number-of-CPUS>1</Number-of-CPUS>
+ </VM-Spec>
 
-For Windows, use all the rest (not tested)
+Required for Linux config:
+OS-Spec: custType, joinDomain, name
+Network-Spec: IP0Network, IP0
 
 -->
 <Specification>
-   <OS-Spec>
-      <custType>Linux</custType>
-  	  <name>SAME_AS_VM</name>
+   <OS-Spec custType="Linux">
+  	  <hostName>SAME_AS_VM</hostName>
       <joinDomain>sec-cdc.local</joinDomain>
       <joinWorkgroup>sec-cdc.local</joinWorkgroup>
   	  <autoLogon>1</autoLogon>
@@ -32,21 +62,31 @@ For Windows, use all the rest (not tested)
   	  <autoUsers>5</autoUsers>
   	  <productId>XXXX-XXXX-XXXX-XXXX-XXXX</productId>
    </OS-Spec>
-   <Network-Spec>
-     <IP0startConnected>1</IP0startConnected>
-     <IP0Network>script_pg</IP0Network>
-     <IP0>dhcp</IP0>
-     <IP0gateway>192.168.0.1</IP0gateway>
-     <IP0dnsServerList>192.168.0.43:192.168.0.1</IP0dnsServerList>
-     <IP0dnsSuffixList>sec-cdc.local</IP0dnsSuffixList>
-     <IP0subnetMask>255.255.255.0</IP0subnetMask>
-     <IP0dnsDomain>calls.local</IP0dnsDomain>
-     <IP0primaryWINS>192.168.0.43</IP0primaryWINS>
-     <IP0secondaryWINS></IP0secondaryWINS>
+   <Network-Spec name="VM Network">
+     <startConnected>1</startConnected>
+     <IP>dhcp</IP>
+     <gateway>192.168.0.1</gateway>
+     <dnsServerList>192.168.0.43:192.168.0.1</dnsServerList>
+     <dnsSuffixList>sec-cdc.local:intranet.de</dnsSuffixList>
+     <subnetMask>255.255.255.0</subnetMask>
+     <dnsDomain>calls.local</dnsDomain>
+     <primaryWINS></primaryWINS>
+     <secondaryWINS></secondaryWINS>
    </Network-Spec>
-   <VM-Spec>
-        <Memory>1024</Memory>
-        <Disksize>4194304</Disksize>
-        <Number-of-CPUS>1</Number-of-CPUS>
+   <Network-Spec name="script_pg">
+     <startConnected>1</startConnected>
+     <IP>10.0.5.5</IP>
+     <gateway>10.0.5.1</gateway>
+     <dnsServerList>10.0.5.252:10.0.5.253</dnsServerList>
+     <dnsSuffixList>sec-cdc.local</dnsSuffixList>
+     <subnetMask>255.255.255.0</subnetMask>
+     <dnsDomain>calls.local</dnsDomain>
+     <primaryWINS></primaryWINS>
+     <secondaryWINS></secondaryWINS>
+   </Network-Spec>
+   <VM-Spec name="YetAnothertagname">
+        <memoryMB>1024</memoryMB>
+        <Disksize>NOT IMPLEMENTED</Disksize>
+        <numCPUs>1</numCPUs>
     </VM-Spec>
 </Specification>

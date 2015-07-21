@@ -11,7 +11,8 @@ from pyVim.connect import SmartConnect, Disconnect
 import atexit
 import argparse
 import getpass
-from DTCustoms import getCustomSpecObject
+from DTCustoms import getOSCustomizationSpec
+from DTCustoms import getVMConfigSpec
 #from DTCustoms import WaitForTasks
 from DTCustoms import getObject
 
@@ -43,7 +44,7 @@ def getArgs():
                         help='Password to use')
 
     parser.add_argument('-v', '--vm-name',
-                        required=True,
+                        required=False,
                         action='store',
                         help='Name of the VM you wish to make')
 
@@ -104,6 +105,12 @@ def getArgs():
                     action='store_true',
                     help='Customize the OS based on xml file')
 
+    parser.add_argument('--customize-vm',
+                    dest='customize_vm',
+                    required=False,
+                    action='store_true',
+                    help='Customize the VM based on the xml file')
+
     parser.add_argument('-f', '--filename',
                         required=False,
                         action='store',
@@ -157,6 +164,7 @@ def cloneVM(
         cluster_name,
         resource_pool,
         customize_os,
+        customize_vm,
         filename,
         power_on):
     """
@@ -190,8 +198,10 @@ def cloneVM(
         else:
             print "Unable to find a suitable resourcePool"
 
-
-    custom_spec = getCustomSpecObject(filename)
+    if customize_os:
+        custom_spec = getOSCustomizationSpec(filename)
+    if customize_vm:                                                            # this does OS-Spec and Network-Spec (both)
+        config_spec = getVMConfigSpec(content, filename, template, vm_name)         # this does VM-Spec
 
     # set relospec
     relospec = vim.vm.RelocateSpec()
@@ -201,12 +211,16 @@ def cloneVM(
     clonespec = vim.vm.CloneSpec()
     clonespec.location = relospec
     clonespec.powerOn = power_on
-    if custom_spec and customize_os:
-        print "Using OS customization.."
-        clonespec.customization = custom_spec
 
-    task = template.CloneVM_Task(folder=destfolder, name=vm_name, spec=clonespec)
-    return task
+    if custom_spec:
+        print "Setting up OS customization.."
+        clonespec.customization = custom_spec
+    if config_spec:
+        print "Setting up VM customization.."
+        clonespec.config = config_spec
+
+    cloneVMtask = template.CloneVM_Task(folder=destfolder, name=vm_name, spec=clonespec)
+    return cloneVMtask
 
 def main():
     """
@@ -241,6 +255,7 @@ def main():
             args.cluster_name,
             args.resource_pool,
             args.customize_os,
+            args.customize_vm,
             args.filename,
             args.power_on)
         print "Cloning VM..."
