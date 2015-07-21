@@ -1,6 +1,6 @@
 # elk-forensics
 
-## Pre-requires:
+## Requirements:
 
 ```bash
 $ sudo pip install argparse requests requests[security] suds vcrpy pyvmomi
@@ -9,5 +9,5 @@ $ sudo pip install argparse requests requests[security] suds vcrpy pyvmomi
 ## Usage
 
 ```bash
-sh init.sh
+
 ```
