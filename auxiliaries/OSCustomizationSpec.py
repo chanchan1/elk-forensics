@@ -8,7 +8,7 @@ from Utils import getSpecFromXML
 # https://www.vmware.com/support/developer/converter-sdk/conv55_apireference/vim.vm.customization.GlobalIPSettings.html
 def customGlobalIPSettings(nw_spec_list):
         if len(nw_spec_list)>1:
-            print "Multiple Network-Spec. That's okay - but choosing the first one for global DNS settings:"
+            print "Multiple Network-Spec found. Choosing the first one for the global DNS settings:"
             print "DNS Server List: ",
             print nw_spec_list[0]['dnsServerList'].split(":")
             print "DNS Suffix List: ",

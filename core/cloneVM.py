@@ -95,4 +95,5 @@ def cloneVM(
         clonespec.config = config_spec
 
     cloneVMtask = template.CloneVM_Task(folder=destfolder, name=vm_name, spec=clonespec)
+
     return cloneVMtask
