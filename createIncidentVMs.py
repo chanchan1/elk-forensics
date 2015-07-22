@@ -19,7 +19,10 @@ def getArgs():
                         action='store',
                         help='vSpehre service to connect to')
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> de0c8c00eb74d429d2da90714b655a78315d02ee
 
     parser.add_argument('-t', '--targethost',
                         required=True,
@@ -58,7 +61,10 @@ def getArgs():
                         action='store',
                         help='vSwitch to use')
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> de0c8c00eb74d429d2da90714b655a78315d02ee
 
     parser.add_argument('-v', '--vm-name',
                         required=False,
