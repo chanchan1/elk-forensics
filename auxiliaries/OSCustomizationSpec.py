@@ -20,18 +20,18 @@ def customGlobalIPSettings(nw_spec_list):
 
 def customSystemPreparation(os_spec):
     """
-	TODO: this is the hostname, valid for Linux and Windows
-	create a condition, if the
-	"""
+    TODO: this is the hostname, valid for Linux and Windows
+    create a condition, if the
+    """
     if "SAME_AS_VM" == os_spec['hostName']:
             cust_name = vim.CustomizationVirtualMachineName()
     else:
             cust_name = vim.CustomizationFixedName(name=os_spec['hostName'])
 
-	# test for Linux or Windows customization
+    # test for Linux or Windows customization
     if (os_spec['custType'].lower() == "linux") or (os_spec['custType'].lower() == "lin"):
             cust_prep = vim.CustomizationLinuxPrep(domain=os_spec['joinDomain'],
-												hostName=cust_name);
+                                                    hostName=cust_name);
 
     elif (os_spec['custType'].lower() == "windows") or (os_spec['custType'].lower() == "win"):
             customization_identity_settings = vim.CustomizationIdentitySettings()
@@ -44,25 +44,25 @@ def customSystemPreparation(os_spec):
 
             password = vim.CustomizationPassword(plainText=True, value=os_spec['domainAdminPassword'])
             cust_identification = vim.CustomizationIdentification(domainAdmin=os_spec['domainAdmin'],
-                                                                domainAdminPassword=password,
-                                                                joinDomain=os_spec['joinDomain'],
-                                                                joinWorkgroup=os_spec['joinWorkgroup'])
+                                                                    domainAdminPassword=password,
+                                                                    joinDomain=os_spec['joinDomain'],
+                                                                    joinWorkgroup=os_spec['joinWorkgroup'])
 
             licenseFilePrintData = vim.CustomizationLicenseFilePrintData(autoMode=customLicenseDataMode,
-            															autoUsers=int(os_spec['autoUsers']))
+                                                                            autoUsers=int(os_spec['autoUsers']))
 
             cust_user_data = vim.CustomizationUserData(fullName=os_spec['fullName'],
-        											orgName=os_spec['orgName'],
-        											computerName=cust_name,
-        											productId=os_spec['productId'])
+                                                        orgName=os_spec['orgName'],
+                                                        computerName=cust_name,
+                                                        productId=os_spec['productId'])
 
             cust_prep = vim.CustomizationSysprep(guiUnattended=cust_gui_unattended,
-    												identification=cust_identification,
-    												licenseFilePrintData=licenseFilePrintData,
-    												userData=cust_user_data);
+                                                    identification=cust_identification,
+                                                    licenseFilePrintData=licenseFilePrintData,
+                                                    userData=cust_user_data);
     else:
-    		print "The custType " + os_spec['custType'] + " is not suported. Quitting.."
-    		exit
+            print "The custType " + os_spec['custType'] + " is not suported. Quitting.."
+            exit
 
     return cust_prep
 
@@ -76,19 +76,19 @@ def customNICSettingMap(nw_spec_list):
     cust_adapter_mapping_list = []
     for nw_spec in nw_spec_list:
         if nw_spec['IP'] and nw_spec['IP'].lower() != "dhcp":
-        	ip_address = vim.CustomizationFixedIp(ipAddress=nw_spec['IP'])
+            ip_address = vim.CustomizationFixedIp(ipAddress=nw_spec['IP'])
         elif nw_spec['IP'].lower() == "dhcp":
-        	ip_address = vim.CustomizationDhcpIpGenerator()
+            ip_address = vim.CustomizationDhcpIpGenerator()
         else:
-        	print "Error while reading ip address ''" + nw_spec['IP'] + "' for customization. Quitting.."
+            print "Error while reading ip address ''" + nw_spec['IP'] + "' for customization. Quitting.."
 
         cust_ip_settings = vim.CustomizationIPSettings(ip=ip_address,
-                      									gateway=nw_spec['gateway'],
-                      									dnsServerList=nw_spec['dnsServerList'],
-                      									subnetMask=nw_spec['subnetMask'],
-                      									dnsDomain=nw_spec['dnsDomain'],
-                      									primaryWINS=nw_spec['primaryWINS'],
-                      									secondaryWINS=nw_spec['secondaryWINS'])
+                                                          gateway=nw_spec['gateway'],
+                                                          dnsServerList=nw_spec['dnsServerList'],
+                                                          subnetMask=nw_spec['subnetMask'],
+                                                          dnsDomain=nw_spec['dnsDomain'],
+                                                          primaryWINS=nw_spec['primaryWINS'],
+                                                          secondaryWINS=nw_spec['secondaryWINS'])
         cust_adapter_mapping_list.append(vim.CustomizationAdapterMapping(adapter=cust_ip_settings))
     return cust_adapter_mapping_list
 

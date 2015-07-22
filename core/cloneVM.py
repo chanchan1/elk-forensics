@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Clone a VM from template, accepts custom configuration from XML
 TODO: threat errors if VM name already exists
@@ -27,7 +26,7 @@ def cloneVM(
         filename,
         power_on):
     """
-    Clone a VM from a template/VM, datacenter_name, vm_folder, datastore_name
+    Clone a VM from a template/VM, vm_folder, datastore_name
     cluster_name, resource_pool, and power_on are all optional.
     """
 

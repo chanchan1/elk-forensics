@@ -49,18 +49,18 @@ Network-Spec: IP0Network, IP0
 -->
 <Specification>
    <OS-Spec custType="Linux">
-  	  <hostName>SAME_AS_VM</hostName>
+     <hostName>SAME_AS_VM</hostName>
       <joinDomain>sec-cdc.local</joinDomain>
       <joinWorkgroup>sec-cdc.local</joinWorkgroup>
-  	  <autoLogon>1</autoLogon>
-  	  <timeZone>100</timeZone>
-  	  <domainAdmin>Administrator</domainAdmin>
-  	  <domainAdminPassword>secret</domainAdminPassword>
-  	  <fullName>Bob von Alice</fullName>
+      <autoLogon>1</autoLogon>
+      <timeZone>100</timeZone>
+      <domainAdmin>Administrator</domainAdmin>
+      <domainAdminPassword>secret</domainAdminPassword>
+      <fullName>Bob von Alice</fullName>
       <orgName>Acme</orgName>
-  	  <autoMode>perServer</autoMode>
-  	  <autoUsers>5</autoUsers>
-  	  <productId>XXXX-XXXX-XXXX-XXXX-XXXX</productId>
+      <autoMode>perServer</autoMode>
+      <autoUsers>5</autoUsers>
+      <productId>XXXX-XXXX-XXXX-XXXX-XXXX</productId>
    </OS-Spec>
    <Network-Spec name="Internal_NFS_Trunk_1_Case01">
      <startConnected>1</startConnected>
