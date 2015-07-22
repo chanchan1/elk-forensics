@@ -8,14 +8,13 @@ TODO: threat errors if VM name already exists
 """
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
+from auxiliaries.OSCustomizationSpec import getOSCustomizationSpec
+from auxiliaries.VMConfigSpec import getVMConfigSpec
+from auxiliaries.Utils import getObject
+
 import atexit
 import argparse
 import getpass
-from DTCustoms import getOSCustomizationSpec
-from DTCustoms import getVMConfigSpec
-#from DTCustoms import WaitForTasks
-from DTCustoms import getObject
-
 
 def getArgs():
     """ Get arguments from CLI """
