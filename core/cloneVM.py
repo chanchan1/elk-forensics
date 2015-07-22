@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 """
-Original code by Dann Bohn
-
-Clone a VM from template, accepts custom configuration
-
+Clone a VM from template, accepts custom configuration from XML
 TODO: threat errors if VM name already exists
+
+Original code: https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/clone_vm.py
+
 """
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 from auxiliaries.OSCustomizationSpec import getOSCustomizationSpec
 from auxiliaries.VMConfigSpec import getVMConfigSpec
 from auxiliaries.Utils import getObject
+from auxiliaries.Utils import getSpecFromXML
 
 import atexit
 import argparse
@@ -45,7 +46,9 @@ def getArgs():
     parser.add_argument('-v', '--vm-name',
                         required=False,
                         action='store',
-                        help='Name of the VM you wish to make')
+                        help='Name of the VM you wish to make. \
+                                If none is given, the script will try \
+                                to fetch it from the XML file.')
 
     parser.add_argument('--template',
                         required=True,
@@ -128,7 +131,7 @@ def getArgs():
                         action='store_false',
                         help='do not power on the VM after creation')
 
-    parser.set_defaults(power_on=True, )
+    parser.set_defaults(power_on=True,)
 
     args = parser.parse_args()
 
@@ -171,6 +174,25 @@ def cloneVM(
     cluster_name, resource_pool, and power_on are all optional.
     """
 
+    if filename:
+        customVMSpec = getSpecFromXML(filename, "VM-Spec")
+        # if a name is not passed, fetch it from the XML file
+        if vm_name is None and customVMSpec['name'] is not None:
+            print "VM name '" + customVMSpec['name'] + "' fetched from '" + filename
+            vm_name = customVMSpec['name']
+        #if vm_name could not be defined (not passed nor found in the XML), quit
+        elif customVMSpec['name'] is None and vm_name is None:
+            print "Unable to continue without a name for the new VM machine."
+            exit
+
+        if customize_os:
+            custom_spec = getOSCustomizationSpec(filename)
+        if customize_vm:                                                            # this does OS-Spec and Network-Spec (both)
+            config_spec = getVMConfigSpec(content, filename, template, vm_name)         # this does VM-Spec
+
+    print "Cloning started from template: '" + template.name + "' ==> '" + vm_name + "'"
+
+
     # if none git the first one
     datacenter = getObject(content, [vim.Datacenter], datacenter_name)
     targethost = getObject(content, [vim.HostSystem], target_host)
@@ -197,11 +219,6 @@ def cloneVM(
         else:
             print "Unable to find a suitable resourcePool"
 
-    if customize_os:
-        custom_spec = getOSCustomizationSpec(filename)
-    if customize_vm:                                                            # this does OS-Spec and Network-Spec (both)
-        config_spec = getVMConfigSpec(content, filename, template, vm_name)         # this does VM-Spec
-
     # set relospec
     relospec = vim.vm.RelocateSpec()
     relospec.datastore = datastore
@@ -226,6 +243,7 @@ def main():
     Let this thing fly
     """
     args = getArgs()
+
 
     # connect this thing
     si = SmartConnect(
