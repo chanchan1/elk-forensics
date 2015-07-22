@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Clone a VM from template, accepts custom configuration from XML
 TODO: threat errors if VM name already exists
@@ -17,7 +16,6 @@ def cloneVM(
         content,
         template,
         vm_name,
-        datacenter_name,
         vm_folder,
         target_host,
         datastore_name,
@@ -28,7 +26,7 @@ def cloneVM(
         filename,
         power_on):
     """
-    Clone a VM from a template/VM, datacenter_name, vm_folder, datastore_name
+    Clone a VM from a template/VM, vm_folder, datastore_name
     cluster_name, resource_pool, and power_on are all optional.
     """
 
@@ -56,7 +54,6 @@ def cloneVM(
 
 
     # if none git the first one
-    datacenter = getObject(content, [vim.Datacenter], datacenter_name)
     targethost = getObject(content, [vim.HostSystem], target_host)
     cluster = getObject(content, [vim.ClusterComputeResource], cluster_name)
 

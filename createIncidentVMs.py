@@ -14,6 +14,7 @@ def getArgs():
                         required=True,
                         action='store',
                         help='vSpehre service to connect to')
+
     parser.add_argument('-t', '--targethost',
                         required=True,
                         action='store',
@@ -34,18 +35,22 @@ def getArgs():
                         required=False,
                         action='store',
                         help='Password to use')
+
     parser.add_argument('-v', '--vlan',
                         required=True,
                         action='store',
                         help='VLAN Tag to use')
+
     parser.add_argument('-i', '--incident',
                         required=True,
                         action='store',
                         help='Name of incident')
+
     parser.add_argument('-w', '--vswitch',
                         required=True,
                         action='store',
                         help='vSwitch to use')
+
     parser.add_argument('-v', '--vm-name',
                         required=False,
                         action='store',
@@ -69,7 +74,7 @@ def getArgs():
                         default=None,
                         help='Name of the VMFolder you wish\
                             the VM to be dumped in. If left blank\
-                            The datacenter VM folder will be used')
+                            The template VM folder will be used')
 
     parser.add_argument('--datastore-name',
                         required=False,
@@ -78,14 +83,6 @@ def getArgs():
                         help='Datastore you wish the VM to end up on\
                             If left blank, VM will be put on the same \
                             datastore as the template')
-
-    parser.add_argument('--datacenter-name',
-                        required=False,
-                        action='store',
-                        default=None,
-                        help='Name of the Datacenter you\
-                            wish to use. If omitted, the first\
-                            datacenter will be used.')
 
     parser.add_argument('--cluster-name',
                         required=False,
@@ -159,7 +156,7 @@ def main():
         add_pg(args.target_host, "Internal_NFS_Trunk_"+i+"_"+args.incident, args.vswitch, args.vlan, content)
 
     #clone vms
-    
+
 
     #configure vms
 
