@@ -89,7 +89,7 @@ def getVirtualNWDeviceSpec(content, nw_spec_list, template):
     networkDevkey_List = getNICDeviceKeyList(template)
 
     if networkDevkey_List:
-        print "Found " + str(len(networkDevkey_List)) + " network device(s) in the template " + template.name
+        print "Found " + str(len(networkDevkey_List)) + " network device(s) in the template VM '" + template.name + "'"
     else:
         print "Couldn't find any network device from " + template.name + " attached to " + target_network
 

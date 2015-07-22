@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from pyVmomi import vim
+from pyVmomi import vim, vmodl
 import xml.etree.ElementTree as ET
 
 # it will parse the XML and return a dictionary with the OS  **OR** VM customization
@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 SUPPORTED_XML_SPECS = [ 'OS-Spec',
                     'VM-Spec',
                     'Network-Spec']
-                    
+
 # maybe using PropertyCollector in the future to look up Views
 # http://www.geeklee.co.uk/object-properties-containerview-pyvmomi/
 def findView(content, vimtype):
@@ -100,14 +100,22 @@ def getVMConfigSpec(content, filename, template, vmname):
                                                     deviceChange=device_config_spec)
     return vm_config_spec;
 
+def waitForTask(task):
+    """ wait for a vCenter task to finish """
+    task_done = False
+    while not task_done:
+        if task.info.state == 'success':
+            return task.info.result
 
-"""
-def WaitForTasks(tasks, si):
+        if task.info.state == 'error':
+            print "The task finished with error"
+            print task.info
+            task_done = True
+
+def waitForTasks(tasks, si):
 
    #Given the service instance si and tasks, it returns after all the
    #tasks are complete
-
-
    pc = si.content.propertyCollector
 
    taskList = [str(task) for task in tasks]
@@ -152,4 +160,3 @@ def WaitForTasks(tasks, si):
    finally:
       if filter:
          filter.Destroy()
-"""

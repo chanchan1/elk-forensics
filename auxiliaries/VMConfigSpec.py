@@ -7,14 +7,6 @@ def getVMConfigSpec(content, filename, template, vmname):
     customVMSpec = getSpecFromXML(filename, "VM-Spec")
     customNetworkSpecList = getSpecFromXML(filename, "Network-Spec")
 
-    # the priority is the name in the XML
-    if customVMSpec['name'] and vmname:
-        print "VM name '" + customVMSpec['name'] + "' fetched from '" + filename + "'. Ignoring " + vmname
-        vmname = customVMSpec['name']
-    elif customVMSpec['name'] is None and vmname is None:
-        print "Unable to continue without a name for the new VM machine."
-        exit
-
     networkDeviceSpec_List = getVirtualNWDeviceSpec(content, customNetworkSpecList, template)
 
     # append here other specifications *multiple network specs, disk, floppy, cd, etc*
