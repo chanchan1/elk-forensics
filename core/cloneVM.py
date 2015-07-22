@@ -17,7 +17,6 @@ def cloneVM(
         content,
         template,
         vm_name,
-        datacenter_name,
         vm_folder,
         target_host,
         datastore_name,
@@ -56,7 +55,6 @@ def cloneVM(
 
 
     # if none git the first one
-    datacenter = getObject(content, [vim.Datacenter], datacenter_name)
     targethost = getObject(content, [vim.HostSystem], target_host)
     cluster = getObject(content, [vim.ClusterComputeResource], cluster_name)
 

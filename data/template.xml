@@ -62,7 +62,7 @@ Network-Spec: IP0Network, IP0
   	  <autoUsers>5</autoUsers>
   	  <productId>XXXX-XXXX-XXXX-XXXX-XXXX</productId>
    </OS-Spec>
-   <Network-Spec name="VM Network">
+   <Network-Spec name="Internal_NFS_Trunk_1_Case01">
      <startConnected>1</startConnected>
      <IP>dhcp</IP>
      <gateway>192.168.0.1</gateway>
@@ -73,7 +73,29 @@ Network-Spec: IP0Network, IP0
      <primaryWINS></primaryWINS>
      <secondaryWINS></secondaryWINS>
    </Network-Spec>
-   <Network-Spec name="script_pg">
+   <Network-Spec name="Internal_NFS_Trunk_2_Case01">
+     <startConnected>1</startConnected>
+     <IP>10.0.5.5</IP>
+     <gateway>10.0.5.1</gateway>
+     <dnsServerList>10.0.5.252:10.0.5.253</dnsServerList>
+     <dnsSuffixList>sec-cdc.local</dnsSuffixList>
+     <subnetMask>255.255.255.0</subnetMask>
+     <dnsDomain>calls.local</dnsDomain>
+     <primaryWINS></primaryWINS>
+     <secondaryWINS></secondaryWINS>
+   </Network-Spec>
+    <Network-Spec name="Internal_NFS_Trunk_3_Case01">
+     <startConnected>1</startConnected>
+     <IP>10.0.5.5</IP>
+     <gateway>10.0.5.1</gateway>
+     <dnsServerList>10.0.5.252:10.0.5.253</dnsServerList>
+     <dnsSuffixList>sec-cdc.local</dnsSuffixList>
+     <subnetMask>255.255.255.0</subnetMask>
+     <dnsDomain>calls.local</dnsDomain>
+     <primaryWINS></primaryWINS>
+     <secondaryWINS></secondaryWINS>
+   </Network-Spec>
+   <Network-Spec name="Internal_NFS_Trunk_4_Case01">
      <startConnected>1</startConnected>
      <IP>10.0.5.5</IP>
      <gateway>10.0.5.1</gateway>

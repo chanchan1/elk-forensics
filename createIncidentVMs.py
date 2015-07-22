@@ -3,6 +3,8 @@ import atexit
 import getpass
 from pyVim.connect import SmartConnect,Disconnect
 from core.addPortgroupToHost import add_pg
+from core.cloneVM import cloneVM
+from auxiliaries.Utils import waitForTasks
 
 
 def getArgs():
@@ -14,11 +16,6 @@ def getArgs():
                         required=True,
                         action='store',
                         help='vSpehre service to connect to')
-    parser.add_argument('-t', '--targethost',
-                        required=True,
-                        action='store',
-                        help='vSpehre host which is changed')
-
     parser.add_argument('-o', '--port',
                         type=int,
                         default=443,
@@ -46,23 +43,6 @@ def getArgs():
                         required=True,
                         action='store',
                         help='vSwitch to use')
-    parser.add_argument('-v', '--vm-name',
-                        required=False,
-                        action='store',
-                        help='Name of the VM you wish to make')
-
-    parser.add_argument('--template',
-                        required=True,
-                        action='store',
-                        help='Name of the template/VM \
-                            you are cloning from')
-
-    parser.add_argument('--target-host',
-                        required=True,
-                        action='store',
-                        help='Name of the target HOST \
-                                the VM will be deployed')
-
     parser.add_argument('--vm-folder',
                         required=False,
                         action='store',
@@ -154,13 +134,45 @@ def main():
     content = si.RetrieveContent()
 
 
-    # add pgs
-    for i in range(1, 4):
-        add_pg(args.target_host, "Internal_NFS_Trunk_"+i+"_"+args.incident, args.vswitch, args.vlan, content)
+    # add pgs DD
+    for i in range(1, 5):
+        add_pg("192.168.2.40", "Internal_NFS_Trunk_"+str(i)+"_"+args.incident, args.vswitch, int(args.vlan), content)
 
-    #clone vms
-    
-
+    #clone vm DD
+    clonevmtask = [cloneVM(  #vm_folder, datastore_name, cluster_name, resource_pool, and power_on are all optional.
+                             content=content,
+                             template="CDC-DAVE-GI",
+                             vm_name="CDC-DAVE-"+args.incident,
+                             target_host="192.168.2.40",
+                             customize_os=True,
+                             customize_vm=True,
+                             filename=args.filename,
+                             vm_folder=None,
+                             datastore_name=None,
+                             cluster_name=None,
+                             resource_pool=None,
+                             power_on=False)]
+    print "Cloning VM..."
+    waitForTasks(clonevmtask, si)
+    print("Cloned VM")
+'''
+    #clone vm AA
+    clonevmtask = [cloneVM(  # programming 101: never put user input into fucntions :X need to filter this before
+                             content,
+                             "CDC-ANNA-GI",
+                             args.vm_name,
+                             args.vm_folder,
+                             args.target_host,
+                             args.datastore_name,
+                             args.cluster_name,
+                             args.resource_pool,
+                             args.customize_os,
+                             args.customize_vm,
+                             args.filename,
+                             args.power_on)]
+    print "Cloning VM..."
+    waitForTasks(clonevmtask, si)
+'''
     #configure vms
 
 # start this thing
