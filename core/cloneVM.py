@@ -7,158 +7,16 @@ Original code: https://github.com/vmware/pyvmomi-community-samples/blob/master/s
 
 """
 from pyVmomi import vim
-from pyVim.connect import SmartConnect, Disconnect
+
 from auxiliaries.OSCustomizationSpec import getOSCustomizationSpec
 from auxiliaries.VMConfigSpec import getVMConfigSpec
 from auxiliaries.Utils import getObject
 from auxiliaries.Utils import getSpecFromXML
 
-import atexit
-import argparse
-import getpass
-
-def getArgs():
-    """ Get arguments from CLI """
-    parser = argparse.ArgumentParser(
-        description='Arguments for talking to vCenter')
-
-    parser.add_argument('-s', '--host',
-                        required=True,
-                        action='store',
-                        help='vSpehre service to connect to')
-
-    parser.add_argument('-o', '--port',
-                        type=int,
-                        default=443,
-                        action='store',
-                        help='Port to connect on')
-
-    parser.add_argument('-u', '--user',
-                        required=True,
-                        action='store',
-                        help='Username to use')
-
-    parser.add_argument('-p', '--password',
-                        required=False,
-                        action='store',
-                        help='Password to use')
-
-    parser.add_argument('-v', '--vm-name',
-                        required=False,
-                        action='store',
-                        help='Name of the VM you wish to make. \
-                                If none is given, the script will try \
-                                to fetch it from the XML file.')
-
-    parser.add_argument('--template',
-                        required=True,
-                        action='store',
-                        help='Name of the template/VM \
-                            you are cloning from')
-
-    parser.add_argument('--target-host',
-                            required=True,
-                            action='store',
-                            help='Name of the target HOST \
-                                the VM will be deployed')
-
-    parser.add_argument('--vm-folder',
-                        required=False,
-                        action='store',
-                        default=None,
-                        help='Name of the VMFolder you wish\
-                            the VM to be dumped in. If left blank\
-                            The datacenter VM folder will be used')
-
-    parser.add_argument('--datastore-name',
-                        required=False,
-                        action='store',
-                        default=None,
-                        help='Datastore you wish the VM to end up on\
-                            If left blank, VM will be put on the same \
-                            datastore as the template')
-
-    parser.add_argument('--datacenter-name',
-                        required=False,
-                        action='store',
-                        default=None,
-                        help='Name of the Datacenter you\
-                            wish to use. If omitted, the first\
-                            datacenter will be used.')
-
-    parser.add_argument('--cluster-name',
-                        required=False,
-                        action='store',
-                        default=None,
-                        help='Name of the cluster you wish the VM to\
-                            end up on. If left blank the first cluster found\
-                            will be used')
-
-    parser.add_argument('--resource-pool',
-                        required=False,
-                        action='store',
-                        default=None,
-                        help='Resource Pool to use. If left blank the first\
-                            resource pool found will be used')
-
-    parser.add_argument('--customize-os',
-                    dest='customize_os',
-                    required=False,
-                    action='store_true',
-                    help='Customize the OS based on xml file')
-
-    parser.add_argument('--customize-vm',
-                    dest='customize_vm',
-                    required=False,
-                    action='store_true',
-                    help='Customize the VM based on the xml file')
-
-    parser.add_argument('-f', '--filename',
-                        required=False,
-                        action='store',
-                        help='The XML file to be used as template. \
-                            There is no schema check yet, so XSD file is irrelevant.')
-
-    parser.add_argument('--power-on',
-                        dest='power_on',
-                        required=False,
-                        action='store_true',
-                        help='power on the VM after creation')
-
-    parser.add_argument('--no-power-on',
-                        dest='power_on',
-                        required=False,
-                        action='store_false',
-                        help='do not power on the VM after creation')
-
-    parser.set_defaults(power_on=True,)
-
-    args = parser.parse_args()
-
-    if not args.password:
-        args.password = getpass.getpass(
-            prompt='Enter password')
-
-    return args
-
-
-def wait_for_task(task):
-    """ wait for a vCenter task to finish """
-    task_done = False
-    while not task_done:
-        if task.info.state == 'success':
-            return task.info.result
-
-        if task.info.state == 'error':
-            print "The task finished with error"
-            print task.info
-            task_done = True
-
 def cloneVM(
         content,
         template,
         vm_name,
-        si,
         datacenter_name,
         vm_folder,
         target_host,
@@ -173,6 +31,10 @@ def cloneVM(
     Clone a VM from a template/VM, datacenter_name, vm_folder, datastore_name
     cluster_name, resource_pool, and power_on are all optional.
     """
+
+    template = getObject(content, [vim.VirtualMachine], template)
+    if not template:
+        print "VM template '" + template + "' not found."
 
     if filename:
         customVMSpec = getSpecFromXML(filename, "VM-Spec")
@@ -237,53 +99,3 @@ def cloneVM(
 
     cloneVMtask = template.CloneVM_Task(folder=destfolder, name=vm_name, spec=clonespec)
     return cloneVMtask
-
-def main():
-    """
-    Let this thing fly
-    """
-    args = getArgs()
-
-
-    # connect this thing
-    si = SmartConnect(
-        host=args.host,
-        user=args.user,
-        pwd=args.password,
-        port=args.port)
-    # disconnect this thing
-    atexit.register(Disconnect, si)
-
-    content = si.RetrieveContent()
-    template = None
-
-    template = getObject(content, [vim.VirtualMachine], args.template)
-
-    if template:
-        clonevmtask = cloneVM(   # programming 101: never put user input into fucntions :X need to filter this before
-            content,
-            template,
-            args.vm_name,
-            si,
-            args.datacenter_name,
-            args.vm_folder,
-            args.target_host,
-            args.datastore_name,
-            args.cluster_name,
-            args.resource_pool,
-            args.customize_os,
-            args.customize_vm,
-            args.filename,
-            args.power_on)
-        print "Cloning VM..."
-        wait_for_task(clonevmtask)
-    else:
-        print "Template not found."
-
-
-#   tasks = [vm.PowerOn() for vm in vmList if vm.name in vmnames]
-#    WaitForTasks(clonevmtask,si)
-
-# start this thing
-if __name__ == "__main__":
-    main()

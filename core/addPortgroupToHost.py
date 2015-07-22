@@ -6,7 +6,7 @@ from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
 
 # from DTCustoms import WaitForTasks
-from core.auxiliaries.Utils import getObject
+from auxiliaries.Utils import getObject
 
 
 def getArgs():

@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
+from pyVmomi import vim, vmodl
 import xml.etree.ElementTree as ET
-
-from pyVmomi import vim
-
 
 # it will parse the XML and return a dictionary with the OS  **OR** VM customization
 # Accept:
-# spec_type  				OS-Spec, VM-Spec
+#	spec_type  				OS-Spec, VM-Spec
 #
 #
 # example:
@@ -20,9 +18,9 @@ from pyVmomi import vim
 # 'full_name': 'VMware', 'timezone': '100', 'domain_user_password': 'secret', 'cust_type': 'Linux', 'autousers': '5',
 # 'productid': 'XXXX-XXXX-XXXX-XXXX-XXXX'}
 #
-SUPPORTED_XML_SPECS = ['OS-Spec',
-                       'VM-Spec',
-                       'Network-Spec']
+SUPPORTED_XML_SPECS = [ 'OS-Spec',
+                    'VM-Spec',
+                    'Network-Spec']
 
 # maybe using PropertyCollector in the future to look up Views
 # http://www.geeklee.co.uk/object-properties-containerview-pyvmomi/
@@ -31,54 +29,50 @@ def findView(content, vimtype):
     objView = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
     return objView
 
-
 def getObject(content, vimtype, name):
-    object = None
-    container = findView(content, vimtype)
-    for c in container.view:  # a container can be a VirtualMachine, HostSystem, ResourcePool, Datastore etc
-        if c.name == name:
-            object = c
-    return object
-
+	object = None
+	container = findView(content, vimtype)
+	for c in container.view: # a container can be a VirtualMachine, HostSystem, ResourcePool, Datastore etc
+		if c.name == name:
+			object = c
+	return object
 
 # aux function to convert some known string values to boolean
 def str2bool(string):
-    if string.lower() in ("yes", "true", "t", "1"):
-        return True
-    if string.lower() in ("no", "false", "f", "0"):
-        return False
-
+  if string.lower() in ("yes", "true", "t", "1"):
+    return True
+  if string.lower() in ("no", "false", "f", "0"):
+    return False
 
 def getSpecFromXML(filename, spec_type):
-    if spec_type in SUPPORTED_XML_SPECS:
-        specList = []
+  if spec_type in SUPPORTED_XML_SPECS:
+    specList = []
 
-        tree = ET.parse(filename)
-        root = tree.getroot()
-        spec = root.findall(spec_type)
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    spec = root.findall(spec_type)
 
-        if spec is None:
-            print "Couldn't find " + spec_type + " in " + filename + "."
-        else:
-            for element in spec:
-                spec_dict = {}
-                if len(element.attrib) == 1:
-                    spec_dict = element.attrib
-                else:
-                    print "Error while parsing the XML. Spec should have only one attribute 'name'"
-                for item in element:
-                    spec_dict[item.tag] = item.text
-                specList.append(spec_dict)
-
-        if len(specList) >= 1:
-            if spec_type == "Network-Spec":  # in this case we return the whole list with network specs
-                return specList
-            else:
-                return specList[0]  # otherwise return a common list
+    if spec is None:
+      print "Couldn't find " + spec_type + " in " + filename + "."
     else:
-        print "I don't understand this spec: " + spec_type + ". \nHint: the spec name is case sensitive."
-        return None
+      for element in spec:
+          spec_dict = {}
+          if len(element.attrib) == 1:
+              spec_dict = element.attrib
+          else:
+              print "Error while parsing the XML. Spec should have only one attribute 'name'"
+          for item in element:
+              spec_dict[item.tag] = item.text
+          specList.append(spec_dict)
 
+    if len(specList) >= 1:
+        if spec_type == "Network-Spec": # in this case we return the whole list with network specs
+            return specList
+        else:
+            return specList[0]          # otherwise return a common list
+  else:
+    print "I don't understand this spec: " + spec_type + ". \nHint: the spec name is case sensitive."
+    return None
 
 def getVMConfigSpec(content, filename, template, vmname):
     customVMSpec = getSpecFromXML(filename, "VM-Spec")
@@ -101,19 +95,27 @@ def getVMConfigSpec(content, filename, template, vmname):
 
     # New object which encapsulates configuration settings when creating or reconfiguring a virtual machine
     vm_config_spec = vim.VirtualMachineConfigSpec(name=vmname,
-                                                  memoryMB=long(customVMSpec['memoryMB']),
-                                                  numCPUs=int(customVMSpec['numCPUs']),
-                                                  deviceChange=device_config_spec)
+                                                    memoryMB=long(customVMSpec['memoryMB']),
+                                                    numCPUs=int(customVMSpec['numCPUs']),
+                                                    deviceChange=device_config_spec)
     return vm_config_spec;
 
+def waitForTask(task):
+    """ wait for a vCenter task to finish """
+    task_done = False
+    while not task_done:
+        if task.info.state == 'success':
+            return task.info.result
 
-"""
-def WaitForTasks(tasks, si):
+        if task.info.state == 'error':
+            print "The task finished with error"
+            print task.info
+            task_done = True
+
+def waitForTasks(tasks, si):
 
    #Given the service instance si and tasks, it returns after all the
    #tasks are complete
-
-
    pc = si.content.propertyCollector
 
    taskList = [str(task) for task in tasks]
@@ -158,4 +160,3 @@ def WaitForTasks(tasks, si):
    finally:
       if filter:
          filter.Destroy()
-"""
